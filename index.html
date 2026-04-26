@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firewall ACL Lab | MLA Tech</title>
+  <meta name="description" content="Interactive Firewall ACL Lab by MLA Tech. Practice configuring Access Control Lists hands-on for Security+, CCNA, and Network+ certifications." />
+  <meta name="author" content="Mohammad Lotfi — mohammadlotfi.com" />
+  <meta name="keywords" content="firewall, ACL, access control list, Security+, CCNA, Network+, cybersecurity, networking, lab, practice, certification" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mohammadlotfi.com" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Firewall ACL Lab | MLA Tech" />
+  <meta property="og:description" content="Hands-on firewall rule simulator. Master ACLs for Security+, CCNA, Network+." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mohammadlotfi.com" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Firewall ACL Lab | MLA Tech" />
+  <meta name="twitter:description" content="Interactive firewall ACL lab — prep for Security+, CCNA, Network+." />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Firewall ACL Lab",
+    "description": "Interactive firewall Access Control List simulator for Security+, CCNA, and Network+ certification preparation.",
+    "author": { "@type": "Person", "name": "Mohammad Lotfi", "url": "https://mohammadlotfi.com" },
+    "publisher": { "@type": "Organization", "name": "MLA Tech" },
+    "educationalLevel": "Beginner to Advanced",
+    "learningResourceType": "Interactive Lab"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --font-body:'Inter',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono','Fira Code',monospace;
+      --r-sm:.375rem; --r-md:.5rem; --r-lg:.75rem; --r-xl:1rem; --r-full:9999px;
+      --t:180ms cubic-bezier(.16,1,.3,1);
+    }
+    [data-theme="dark"] {
+      --bg:#0d0d0f; --bg-p:#131316; --bg-s:#1a1a1e; --bg-s2:#202025;
+      --bd:#2a2a30; --bd-s:rgba(255,255,255,.06);
+      --tx:#e8e8ea; --tx-m:#9898a6; --tx-f:#55555f; --tx-i:#0d0d0f;
+      --ac:#f0c93a; --ac-d:rgba(240,201,58,.12); --ac-g:rgba(240,201,58,.25); --ac-h:#f5d668;
+      --ok:#3dd68c; --ok-d:rgba(61,214,140,.12);
+      --er:#f25c5c; --er-d:rgba(242,92,92,.12);
+      --sh:0 4px 16px rgba(0,0,0,.4);
+    }
+    [data-theme="light"] {
+      --bg:#f4f4f6; --bg-p:#fff; --bg-s:#f9f9fb; --bg-s2:#efeff3;
+      --bd:#dcdce4; --bd-s:rgba(0,0,0,.06);
+      --tx:#1a1a22; --tx-m:#5e5e70; --tx-f:#ababbb; --tx-i:#fff;
+      --ac:#b8860b; --ac-d:rgba(184,134,11,.1); --ac-g:rgba(184,134,11,.2); --ac-h:#8b6508;
+      --ok:#1a9e5f; --ok-d:rgba(26,158,95,.1);
+      --er:#d63030; --er-d:rgba(214,48,48,.1);
+      --sh:0 4px 16px rgba(0,0,0,.1);
+    }
+
+    /* ── RESET ── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;text-rendering:optimizeLegibility}
+    body{font-family:var(--font-body);font-size:1rem;color:var(--tx);background:var(--bg);line-height:1.6;min-height:100dvh;transition:background var(--t),color var(--t)}
+    img,svg{display:block;max-width:100%}
+    input,button,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer;background:none;border:none}
+    ::selection{background:var(--ac-d);color:var(--tx)}
+    :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:var(--r-sm)}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    /* ── LAYOUT ── */
+    .app{display:flex;min-height:100dvh}
+
+    /* ── SIDEBAR ── */
+    .sidebar{
+      width:380px;min-width:300px;flex-shrink:0;
+      background:var(--bg-p);border-right:1px solid var(--bd);
+      display:flex;flex-direction:column;
+      position:sticky;top:0;height:100dvh;overflow-y:auto;
+      scrollbar-width:thin;scrollbar-color:var(--bd) transparent;z-index:10;
+    }
+    .sb-top{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.6rem 1.25rem;border-bottom:1px solid var(--bd);
+      background:var(--bg-p);position:sticky;top:0;z-index:2;
+    }
+    .brand-flag{font-size:.65rem;font-weight:700;color:var(--tx-f);letter-spacing:.1em;text-transform:uppercase}
+    .btn-theme{
+      width:32px;height:32px;border-radius:var(--r-md);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--tx-m);border:1px solid var(--bd);transition:all var(--t);
+    }
+    .btn-theme:hover{color:var(--ac);border-color:var(--ac)}
+    .btn-theme svg{width:15px;height:15px;pointer-events:none}
+
+    .sb-inner{padding:1.25rem;display:flex;flex-direction:column;gap:1.25rem}
+
+    .brand{display:flex;align-items:center;gap:.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--bd)}
+    .brand-logo{
+      flex-shrink:0;width:42px;height:42px;background:var(--ac);
+      border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--tx-i);
+    }
+    .brand-logo svg{width:22px;height:22px}
+    .brand-text h1{font-size:.9rem;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--tx)}
+    .brand-text p{font-size:.75rem;color:var(--tx-m);margin-top:2px}
+    .brand-text a{font-size:.75rem;color:var(--ac);text-decoration:none;font-weight:600;transition:color var(--t)}
+    .brand-text a:hover{color:var(--ac-h);text-decoration:underline}
+
+    .badges{display:flex;flex-wrap:wrap;gap:.375rem}
+    .badge{font-size:.65rem;font-weight:700;padding:2px .5rem;border-radius:var(--r-full);border:1px solid var(--bd);color:var(--tx-m);letter-spacing:.04em;text-transform:uppercase}
+    .badge.on{background:var(--ac-d);border-color:var(--ac);color:var(--ac)}
+
+    .lbl{display:block;font-size:.7rem;font-weight:700;color:var(--tx-m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+
+    .sel-wrap{position:relative}
+    .sel-wrap::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:0;height:0;border:5px solid transparent;border-top-color:var(--tx-f);pointer-events:none}
+    select{width:100%;padding:.625rem 2rem .625rem .875rem;background:var(--bg-s);border:1px solid var(--bd);color:var(--tx);border-radius:var(--r-md);appearance:none;font-size:.875rem;cursor:pointer;transition:border-color var(--t)}
+    select:hover{border-color:var(--tx-f)}
+    select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-d)}
+
+    /* Scenario card */
+    .sc-card{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r-lg);padding:1rem;position:relative;overflow:hidden}
+    .sc-card::after{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--ac),transparent)}
+    .sc-head{display:flex;align-items:center;gap:.5rem;margin-bottom:.875rem}
+    .pulse{width:8px;height:8px;background:var(--ac);border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 var(--ac-g)}50%{opacity:.7;box-shadow:0 0 0 4px transparent}}
+    .sc-head h3{font-size:.7rem;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.1em}
+    #scenario-story{font-size:.85rem;color:var(--tx);line-height:1.75;margin-bottom:.875rem}
+    #scenario-story code{font-family:var(--font-mono);font-size:.8em;background:var(--bg-s2);padding:1px 5px;border-radius:3px;color:var(--ac)}
+    .specs{background:var(--bg);border:1px solid var(--bd-s);border-radius:var(--r-md);padding:.625rem .875rem;margin-bottom:.875rem}
+    .spec-row{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:.7rem;padding:3px 0}
+    .spec-row+.spec-row{border-top:1px solid var(--bd-s)}
+    .spec-l{color:var(--tx-f)} .spec-v{color:var(--ac);font-weight:600}
+
+    /* Hint */
+    .hint-wrap{padding-top:1rem;border-top:1px solid var(--bd)}
+    .hint-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.625rem}
+    .hint-hd h4{font-size:.7rem;font-weight:700;color:var(--tx-m);text-transform:uppercase;letter-spacing:.08em}
+    .btn-mini{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px .625rem;border-radius:var(--r-full);border:1px solid var(--bd);color:var(--tx-m);transition:all var(--t)}
+    .btn-mini:hover{border-color:var(--ac);color:var(--ac)}
+    .btn-mini.on{background:var(--ac-d);border-color:var(--ac);color:var(--ac)}
+    .hint-box{background:var(--bg-s2);border:1px dashed var(--bd);border-radius:var(--r-md);padding:.875rem;animation:fadeIn .2s ease}
+    #hint-text{font-size:.825rem;color:var(--tx-m);line-height:1.75}
+    #hint-text strong{color:var(--tx)}
+    #hint-text code{font-family:var(--font-mono);font-size:.85em;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--ac)}
+
+    .btn-new{width:100%;padding:.625rem .875rem;border-radius:var(--r-md);border:1px solid var(--bd);background:transparent;color:var(--tx-m);font-size:.85rem;font-weight:500;transition:all var(--t);display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn-new:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-d)}
+    .btn-new svg{width:13px;height:13px;flex-shrink:0}
+
+    /* ── WORKSPACE ── */
+    .workspace{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+    .ws-hd{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:.75rem;background:var(--bg);position:sticky;top:0;z-index:5}
+    .ws-title h2{font-size:1.375rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;color:var(--tx)}
+    .ws-title p{font-size:.85rem;color:var(--tx-m);margin-top:.25rem}
+    .env-badge{display:flex;align-items:center;gap:.5rem;background:var(--ok-d);border:1px solid rgba(61,214,140,.25);color:var(--ok);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.375rem .75rem;border-radius:var(--r-full);white-space:nowrap}
+    .env-dot{width:6px;height:6px;background:var(--ok);border-radius:50%;box-shadow:0 0 6px var(--ok);animation:pulse 2s ease-in-out infinite}
+
+    .ws-body{flex:1;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.25rem}
+
+    /* Table */
+    .tbl-card{background:var(--bg-p);border:1px solid var(--bd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh)}
+    .tbl-scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+    .fw-tbl{width:100%;border-collapse:collapse;min-width:680px}
+    .fw-tbl thead th{background:var(--bg-s);text-align:left;padding:.625rem 1rem;font-size:.7rem;font-weight:700;color:var(--tx-m);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bd);white-space:nowrap}
+    .fw-tbl td{padding:.5rem .875rem;border-bottom:1px solid var(--bd-s);vertical-align:middle}
+    .fw-tbl tbody tr:last-child td{border-bottom:none}
+    .fw-tbl tbody tr{transition:background var(--t)}
+    .fw-tbl tbody tr:hover{background:var(--bg-s2)}
+    .fw-tbl tbody tr.row-err{background:var(--er-d)!important}
+    .col-id{width:44px;text-align:center;color:var(--tx-f);font-size:.75rem;font-family:var(--font-mono)}
+    .col-ip{width:22%;min-width:130px}
+    .fw-tbl input,.fw-tbl select{background:var(--bg-s);border:1px solid var(--bd);color:var(--tx);padding:.375rem .625rem;border-radius:var(--r-sm);font-family:var(--font-mono);font-size:.75rem;width:100%;transition:border-color var(--t)}
+    .fw-tbl input:hover,.fw-tbl select:hover{border-color:var(--tx-f)}
+    .fw-tbl input:focus,.fw-tbl select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 2px var(--ac-d)}
+    .fw-tbl select{appearance:none;cursor:pointer;padding-right:1.5rem;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6b7b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 6px center;background-size:11px}
+    .allow{color:var(--ok)!important;font-weight:700}
+    .deny{color:var(--er)!important;font-weight:700}
+    tfoot tr{background:var(--er-d)}
+    tfoot td{padding:.5rem .875rem;font-family:var(--font-mono);font-size:.75rem;color:var(--tx-f);border:none}
+    .deny-txt{color:var(--er);font-weight:700}
+    .imp-lbl{font-size:.7rem;color:var(--tx-f);display:flex;align-items:center;gap:.25rem}
+    .row-btns{display:flex;gap:.25rem;justify-content:flex-end;align-items:center}
+    .btn-r{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all var(--t);flex-shrink:0}
+    .btn-r.mv{background:var(--bg-s2);border:1px solid var(--bd);color:var(--tx-f)}
+    .btn-r.mv:hover{border-color:var(--tx-m);color:var(--tx)}
+    .btn-r.rm{background:var(--er-d);border:1px solid transparent;color:var(--er)}
+    .btn-r.rm:hover{background:var(--er);color:#fff}
+
+    /* Controls */
+    .controls{display:flex;justify-content:space-between;align-items:center;gap:.875rem;flex-wrap:wrap}
+    .ctl-l,.ctl-r{display:flex;gap:.5rem;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.5rem 1.125rem;border-radius:var(--r-md);font-size:.875rem;font-weight:600;transition:all var(--t);white-space:nowrap;min-height:40px;border:1px solid transparent}
+    .btn svg{width:13px;height:13px;flex-shrink:0}
+    .btn-prim{background:var(--ac);color:var(--tx-i);border-color:var(--ac)}
+    .btn-prim:hover{background:var(--ac-h);border-color:var(--ac-h);transform:translateY(-1px);box-shadow:0 4px 12px var(--ac-g)}
+    .btn-prim:active{transform:translateY(0)}
+    .btn-sec{background:transparent;color:var(--tx-m);border-color:var(--bd)}
+    .btn-sec:hover{border-color:var(--tx-m);color:var(--tx)}
+    .btn-outl{background:transparent;color:var(--ac);border-color:var(--ac)}
+    .btn-outl:hover{background:var(--ac-d)}
+    .btn-er{background:transparent;color:var(--er);border-color:var(--er-d)}
+    .btn-er:hover{background:var(--er-d);border-color:var(--er)}
+
+    /* Feedback */
+    .feedback{border-radius:var(--r-lg);border:1px solid var(--bd);overflow:hidden;animation:slideUp .3s cubic-bezier(.16,1,.3,1);box-shadow:var(--sh)}
+    @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fb-hd{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.25rem;border-bottom:1px solid var(--bd-s)}
+    .feedback.ok .fb-hd{background:var(--ok-d)}
+    .feedback.er .fb-hd{background:var(--er-d)}
+    .res-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+    .feedback.ok .res-icon{background:rgba(61,214,140,.2);color:var(--ok)}
+    .feedback.er .res-icon{background:rgba(242,92,92,.2);color:var(--er)}
+    .fb-hd h4{font-size:.875rem;font-weight:700;color:var(--tx)}
+    .fb-body{padding:1.25rem;background:var(--bg-p);font-size:.875rem;line-height:1.7}
+    .fb-sec{padding-bottom:.875rem;border-bottom:1px solid var(--bd-s);margin-bottom:.875rem}
+    .fb-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .fb-sub{font-size:.7rem;font-weight:700;color:var(--tx-m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+    .err-list{margin-left:1.25rem;color:var(--er);display:flex;flex-direction:column;gap:.25rem}
+    .err-list strong{color:var(--tx)}
+    .fb-text strong{color:var(--ac)}
+    .sol-block{margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--bd);animation:fadeIn .25s ease}
+    .sol-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:.5rem}
+    .sol-code{font-family:var(--font-mono);font-size:.75rem;color:var(--tx-m);background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r-md);padding:.75rem 1rem;line-height:1.9;margin-bottom:.625rem;white-space:pre-wrap;word-break:break-all}
+    .proto-note{font-size:.8rem;color:var(--tx-m);border-left:2px solid var(--ac);padding-left:.75rem;line-height:1.75}
+    .proto-note strong{color:var(--tx-m)}
+
+    /* Footer */
+    .ws-ft{border-top:1px solid var(--bd);padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;background:var(--bg)}
+    .ft-l{display:flex;align-items:center;gap:.625rem;font-size:.75rem;color:var(--tx-f)}
+    .ft-brand{font-weight:700;color:var(--tx-m)}
+    .ft-sep{color:var(--bd)}
+    .ft-r{font-size:.75rem;color:var(--tx-f)}
+    .ft-r a{color:var(--ac);text-decoration:none;font-weight:600;transition:color var(--t)}
+    .ft-r a:hover{color:var(--ac-h)}
+
+    /* Utils */
+    .hidden{display:none!important}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:var(--r-full)}
+    ::-webkit-scrollbar-thumb:hover{background:var(--tx-f)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* ── MOBILE ── */
+    @media(max-width:900px){
+      .app{flex-direction:column}
+      .sidebar{width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid var(--bd)}
+      .ws-hd{padding:1rem;position:static}
+      .ws-body{padding:1rem;gap:1rem}
+      .ws-ft{padding:.75rem 1rem}
+    }
+    @media(max-width:600px){
+      .controls{flex-direction:column;align-items:stretch}
+      .ctl-l,.ctl-r{justify-content:stretch}
+      .ctl-l .btn,.ctl-r .btn{flex:1}
+      .ws-title h2{font-size:1.1rem}
+      .env-badge{font-size:.6rem}
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#rule-body" class="sr-only" style="position:fixed;top:-100%;left:1rem;z-index:9999;background:var(--ac);color:var(--tx-i);padding:.5rem 1rem;border-radius:var(--r-md);font-weight:700" onfocus="this.style.top='1rem'" onblur="this.style.top='-100%'">Skip to ACL table</a>
+
+  <div class="app">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar" role="complementary" aria-label="Lab configuration">
+
+      <div class="sb-top">
+        <span class="brand-flag">MLA Tech</span>
+        <button class="btn-theme" id="btn-theme" aria-label="Toggle theme">
+          <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sb-inner">
+
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3L4 7v5c0 5 4 9 8 10 4-1 8-5 8-10V7l-8-4z"/>
+              <path d="M9 12l2 2 4-4" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>MLA Tech &mdash; Firewall Lab</h1>
+            <p>Certification practice &amp; simulation</p>
+            <a href="https://mohammadlotfi.com/video-tutorials/" rel="noopener noreferrer">mohammadlotfi.com &#8594;</a>
+          </div>
+        </div>
+
+        <div>
+          <span class="lbl">Target Certifications</span>
+          <div class="badges">
+            <span class="badge on">Security+</span>
+            <span class="badge">CCNA</span>
+            <span class="badge">Network+</span>
+            <span class="badge">CySA+</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="lbl" for="difficultySelect">Difficulty Level</label>
+          <div class="sel-wrap">
+            <select id="difficultySelect" aria-label="Select difficulty level">
+              <option value="level1">Level 1 &mdash; Trainee (Host-to-Host)</option>
+              <option value="level2">Level 2 &mdash; Analyst (Subnet Filtering)</option>
+              <option value="level3">Level 3 &mdash; Engineer (Server Hardening)</option>
+              <option value="level4">Level 4 &mdash; Specialist (Multi-Service)</option>
+              <option value="level5">Level 5 &mdash; Architect (DMZ Segmentation)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sc-card" role="region" aria-label="Current scenario">
+          <div class="sc-head">
+            <span class="pulse" aria-hidden="true"></span>
+            <h3>Scenario Objective</h3>
+          </div>
+          <p id="scenario-story">Loading&hellip;</p>
+          <div class="specs" id="scenario-details" aria-live="polite"></div>
+          <button id="btn-new" class="btn-new" aria-label="Generate new scenario">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+            Generate New Scenario
+          </button>
+        </div>
+
+        <div class="hint-wrap">
+          <div class="hint-hd">
+            <h4>Reference / Hints</h4>
+            <button id="btn-hint" class="btn-mini" aria-expanded="false" aria-controls="hint-box">Show Intel</button>
+          </div>
+          <div id="hint-box" class="hint-box hidden" role="region" aria-label="Hints and reference">
+            <p id="hint-text">Select a difficulty to start.</p>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ═══ WORKSPACE ═══ -->
+    <main class="workspace" role="main">
+
+      <header class="ws-hd">
+        <div class="ws-title">
+          <h2>Firewall Access Control List</h2>
+          <p>Configure perimeter rules based on the scenario objectives.</p>
+        </div>
+        <div class="env-badge" aria-label="Simulation active">
+          <span class="env-dot" aria-hidden="true"></span>
+          LIVE SIM
+        </div>
+      </header>
+
+      <div class="ws-body">
+
+        <div class="tbl-card" role="region" aria-label="Firewall ACL rules">
+          <div class="tbl-scroll">
+            <table class="fw-tbl" aria-label="Access Control List">
+              <thead>
+                <tr>
+                  <th class="col-id" scope="col">#</th>
+                  <th class="col-ip" scope="col">Source IP / CIDR</th>
+                  <th class="col-ip" scope="col">Destination IP</th>
+                  <th scope="col">Protocol</th>
+                  <th scope="col">Port</th>
+                  <th scope="col">Action</th>
+                  <th scope="col"><span class="sr-only">Manage</span></th>
+                </tr>
+              </thead>
+              <tbody id="rule-body" aria-live="polite"></tbody>
+              <tfoot>
+                <tr aria-label="Implicit deny all — always last">
+                  <td class="col-id">*</td>
+                  <td>ANY</td><td>ANY</td><td>ANY</td><td>ANY</td>
+                  <td><span class="deny-txt">DENY</span></td>
+                  <td><span class="imp-lbl">&#128274; IMPLICIT</span></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="controls" role="toolbar" aria-label="Lab controls">
+          <div class="ctl-l">
+            <button id="btn-add" class="btn btn-prim" aria-label="Add ACL rule">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add ACL Rule
+            </button>
+            <button id="btn-reset" class="btn btn-sec" aria-label="Reset lab">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
+              Reset Lab
+            </button>
+          </div>
+          <div class="ctl-r">
+            <button id="btn-check" class="btn btn-outl" aria-label="Verify ACL configuration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Verify Config
+            </button>
+            <button id="btn-reveal" class="btn btn-er hidden" aria-label="Show solution">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Show Solution
+            </button>
+          </div>
+        </div>
+
+        <div id="feedback" class="feedback hidden" role="alert" aria-live="assertive">
+          <div class="fb-hd">
+            <div id="fb-icon" class="res-icon" aria-hidden="true"></div>
+            <h4 id="fb-title">Analysis Result</h4>
+          </div>
+          <div id="fb-body" class="fb-body"></div>
+        </div>
+
+      </div><!-- /ws-body -->
+
+      <footer class="ws-ft" aria-label="Site footer">
+        <div class="ft-l">
+          <span class="ft-brand">MLA Tech</span>
+          <span class="ft-sep">&middot;</span>
+          <span>Interactive Firewall Lab</span>
+          <span class="ft-sep">&middot;</span>
+          <span>Security+ &bull; CCNA &bull; Network+</span>
+        </div>
+        <div class="ft-r">
+          More labs &amp; courses: <a href="https://mohammadlotfi.com" target="_blank" rel="noopener noreferrer">mohammadlotfi.com</a>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    // ── THEME ──
+    (function(){
+      var html = document.documentElement;
+      var btn  = document.getElementById('btn-theme');
+      var icon = document.getElementById('theme-icon');
+      var MOON = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+      var SUN  = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+      var theme = 'dark';
+      function apply(t){
+        theme = t;
+        html.setAttribute('data-theme', t);
+        icon.innerHTML = t === 'dark' ? MOON : SUN;
+        btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      }
+      btn.addEventListener('click', function(){ apply(theme === 'dark' ? 'light' : 'dark'); });
+      apply('dark');
+    })();
+
+    // ── PORT REGISTRY ──
+    var PORTS = [
+      {p:21,   n:'FTP',    proto:'TCP', desc:'File Transfer Protocol. Used to transfer files between hosts. Unencrypted &mdash; avoid in production.'},
+      {p:22,   n:'SSH',    proto:'TCP', desc:'Secure Shell. Encrypted remote administration and file transfer (SFTP/SCP).'},
+      {p:23,   n:'Telnet', proto:'TCP', desc:'Legacy remote access protocol. Sends credentials in plaintext &mdash; replaced by SSH.'},
+      {p:25,   n:'SMTP',   proto:'TCP', desc:'Simple Mail Transfer Protocol. Handles outbound email delivery between servers.'},
+      {p:53,   n:'DNS',    proto:'UDP', desc:'Domain Name System. Resolves hostnames to IP addresses. Uses UDP for queries (small, one-shot).'},
+      {p:69,   n:'TFTP',   proto:'UDP', desc:'Trivial File Transfer Protocol. Used for PXE boot and pushing configs to network devices.'},
+      {p:80,   n:'HTTP',   proto:'TCP', desc:'Hypertext Transfer Protocol. Unencrypted web traffic. Replaced by HTTPS in most deployments.'},
+      {p:110,  n:'POP3',   proto:'TCP', desc:'Post Office Protocol v3. Downloads email from a server to a local client (then deletes from server).'},
+      {p:123,  n:'NTP',    proto:'UDP', desc:'Network Time Protocol. Synchronises clocks across devices. Uses UDP for low-latency time queries.'},
+      {p:143,  n:'IMAP',   proto:'TCP', desc:'Internet Message Access Protocol. Syncs email across multiple devices; leaves mail on server.'},
+      {p:161,  n:'SNMP',   proto:'UDP', desc:'Simple Network Management Protocol. Polls device MIBs for monitoring. Uses UDP (lightweight polls).'},
+      {p:443,  n:'HTTPS',  proto:'TCP', desc:'HTTP Secure. Encrypted web traffic over TLS/SSL. Standard for all modern web services.'},
+      {p:445,  n:'SMB',    proto:'TCP', desc:'Server Message Block. Windows file sharing, printer sharing, and Active Directory traffic.'},
+      {p:1433, n:'MSSQL',  proto:'TCP', desc:'Microsoft SQL Server. Used for database queries and replication between app and DB tiers.'},
+      {p:3306, n:'MySQL',  proto:'TCP', desc:'MySQL database server. Application servers connect to this for database read/write operations.'},
+      {p:3389, n:'RDP',    proto:'TCP', desc:'Remote Desktop Protocol. Provides a full GUI remote session to a Windows machine.'},
+    ];
+
+    // ── STATE ──
+    var state = {rules:[], scenario:null, difficulty:'level1', errIds:[], recentIdx:[]};
+
+    // ── HELPERS ──
+    function randOctet(){ return Math.floor(Math.random()*253)+1; }
+    function randIP(prefix){
+      var base = prefix ? prefix.substring(0, prefix.lastIndexOf('.')) : ('10.5.'+Math.floor(Math.random()*10));
+      return base+'.'+randOctet();
+    }
+    function randExtIP(){ return (20+Math.floor(Math.random()*200))+'.'+randOctet()+'.'+randOctet()+'.'+randOctet(); }
+    function randSubnet(){ return '192.168.'+Math.floor(Math.random()*50)+'.0/24'; }
+    function randDiffIP(prefix, exclude){
+      var ip, tries=0;
+      do { ip = randIP(prefix); tries++; } while(ip === exclude && tries < 30);
+      return ip;
+    }
+    function clean(v){
+      if(v===null||v===undefined) return '';
+      var s = v.toString().trim();
+      if(s.toUpperCase()==='ANY'||s==='*'||s==='0.0.0.0/0') return 'ANY';
+      return s;
+    }
+    function esc(v){
+      if(!v) return '';
+      return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── DOM REFS ──
+    var D = {
+      body:      document.getElementById('rule-body'),
+      diff:      document.getElementById('difficultySelect'),
+      story:     document.getElementById('scenario-story'),
+      specs:     document.getElementById('scenario-details'),
+      fb:        document.getElementById('feedback'),
+      fbTitle:   document.getElementById('fb-title'),
+      fbBody:    document.getElementById('fb-body'),
+      hintBox:   document.getElementById('hint-box'),
+      hintText:  document.getElementById('hint-text'),
+      btnCheck:  document.getElementById('btn-check'),
+      btnReveal: document.getElementById('btn-reveal'),
+      btnNew:    document.getElementById('btn-new'),
+      btnAdd:    document.getElementById('btn-add'),
+      btnReset:  document.getElementById('btn-reset'),
+      btnHint:   document.getElementById('btn-hint'),
+    };
+
+    // ── PROTO EXPLANATION (Intel only) ──
+    function protoExpl(svc){
+      if(svc.proto==='TCP') return '<strong>TCP</strong> is used for '+svc.n+' because it requires a reliable, ordered, connection-oriented session (3-way handshake). Lost packets are retransmitted.';
+      var m = {
+        DNS: 'DNS uses <strong>UDP</strong> because queries are small, single-packet requests where low latency matters more than reliability.',
+        NTP: 'NTP uses <strong>UDP</strong> to minimise round-trip latency for accurate clock synchronisation.',
+        SNMP:'SNMP uses <strong>UDP</strong> for lightweight, connectionless polling of device MIBs.',
+        TFTP:'TFTP uses <strong>UDP</strong> for simplicity in PXE boot and config-delivery environments.',
+      };
+      return m[svc.n] || '<strong>UDP</strong> &mdash; connectionless, lower overhead, prioritises speed over guaranteed delivery.';
+    }
+
+    // ── GENERATE SCENARIO ──
+    function generate(){
+      state.difficulty = D.diff.value;
+      state.rules = [];
+      state.errIds = [];
+
+      // Close hint on new scenario so students can't peek immediately
+      D.hintBox.classList.add('hidden');
+      D.btnHint.textContent = 'Show Intel';
+      D.btnHint.classList.remove('on');
+      D.btnHint.setAttribute('aria-expanded','false');
+
+      var lvl = state.difficulty;
+
+      if(lvl==='level1'){
+        var idx, tries=0;
+        do { idx=Math.floor(Math.random()*PORTS.length); tries++; }
+        while(state.recentIdx.indexOf(idx)!==-1 && tries<20);
+        state.recentIdx.push(idx);
+        if(state.recentIdx.length>4) state.recentIdx.shift();
+        var svc=PORTS[idx], src=randExtIP(), dst=randIP();
+        state.scenario={
+          type:'level1', src:src, dst:dst, service:svc,
+          story:'<strong>TICKET #'+(Math.floor(1000+Math.random()*8999))+':</strong> Connectivity Issue.<br>'+
+                'A remote consultant at <code>'+src+'</code> requires access to the internal server at <code>'+dst+'</code> '+
+                'using <strong>'+svc.n+'</strong>. Current policy is blocking this connection. '+
+                'Create the minimum required ALLOW rule.'
+        };
+        // Intel hint — port + protocol live here only
+        D.hintText.innerHTML =
+          '<strong>'+svc.n+'</strong> &mdash; '+svc.desc+'<br><br>'+
+          '&#128274; Protocol: <code>'+svc.proto+'</code> &nbsp;|&nbsp; Port: <code>'+svc.p+'</code><br><br>'+
+          protoExpl(svc);
+
+      } else if(lvl==='level2'){
+        var subnet=randSubnet(), server=randIP();
+        state.scenario={
+          type:'level2', src:subnet, dst:server,
+          story:'<strong>SIEM ALERT &mdash; Critical:</strong> Active malware outbreak confirmed in VLAN <code>'+subnet+'</code>.<br>'+
+                'Immediately <strong>block all traffic</strong> from this subnet to the Finance Server at <code>'+server+'</code>.'
+        };
+        D.hintText.innerHTML =
+          'To block an entire subnet, use <strong>CIDR notation</strong> in the Source field (e.g. <code>192.168.x.0/24</code>).<br><br>'+
+          '&ldquo;All traffic&rdquo; means set both Protocol and Port to <strong>ANY</strong>.<br><br>'+
+          'Remember: a DENY rule that matches all traffic from the subnet is what you need here.';
+
+      } else if(lvl==='level3'){
+        var srv=randIP(), adm=randExtIP();
+        state.scenario={
+          type:'level3', server:srv, admin:adm,
+          s1:{n:'HTTPS',p:443,proto:'TCP'}, s2:{n:'SSH',p:22,proto:'TCP'},
+          story:'<strong>CHANGE REQUEST:</strong> Production Web Server at <code>'+srv+'</code>.<br>'+
+                '1. Allow the <strong>public internet</strong> (any source) to reach the server over <strong>HTTPS</strong>.<br>'+
+                '2. Allow the sysadmin at <code>'+adm+'</code> to manage it via <strong>SSH</strong>.<br>'+
+                '3. All other access must remain blocked (implicit deny covers this).'
+        };
+        D.hintText.innerHTML =
+          '<strong>HTTPS</strong> &mdash; Protocol: <code>TCP</code> &nbsp;|&nbsp; Port: <code>443</code><br>'+
+          '<strong>SSH</strong> &nbsp;&nbsp;&nbsp;&mdash; Protocol: <code>TCP</code> &nbsp;|&nbsp; Port: <code>22</code><br><br>'+
+          'Rule order matters. When source <code>'+adm+'</code> connects on port 22, the firewall reads rules top-down and applies the first match. '+
+          'Think carefully about whether order causes any unintended overlap here.';
+
+      } else if(lvl==='level4'){
+        var i1=Math.floor(Math.random()*PORTS.length);
+        var i2=(i1+1+Math.floor(Math.random()*(PORTS.length-1)))%PORTS.length;
+        var s1=PORTS[i1], s2=PORTS[i2], srv4=randIP();
+        state.scenario={
+          type:'level4', server:srv4, s1:s1, s2:s2,
+          story:'<strong>APP REQUIREMENT:</strong> Legacy Application Server at <code>'+srv4+'</code>.<br>'+
+                '1. Allow inbound <strong>'+s1.n+'</strong> access from <strong>any source</strong>.<br>'+
+                '2. Allow inbound <strong>'+s2.n+'</strong> access from <strong>any source</strong>.<br>'+
+                'All other traffic must remain blocked.'
+        };
+        D.hintText.innerHTML =
+          '<strong>'+s1.n+'</strong> &mdash; Protocol: <code>'+s1.proto+'</code> &nbsp;|&nbsp; Port: <code>'+s1.p+'</code><br>'+
+          '<em style="font-size:.8em">'+s1.desc+'</em><br><br>'+
+          '<strong>'+s2.n+'</strong> &mdash; Protocol: <code>'+s2.proto+'</code> &nbsp;|&nbsp; Port: <code>'+s2.p+'</code><br>'+
+          '<em style="font-size:.8em">'+s2.desc+'</em>';
+
+      } else if(lvl==='level5'){
+        var dmz=randIP('10.0.1.0');
+        var db=randIP('192.168.10.0');
+        var bk=randDiffIP('192.168.10.0', db);
+        state.scenario={
+          type:'level5', dmz:dmz, db:db, bk:bk,
+          story:'<strong>ARCHITECTURE REVIEW:</strong> DMZ Web Server (<code>'+dmz+'</code>) connectivity policy.<br>'+
+                '1. Web Server must push data to the Internal Database at <code>'+db+'</code> using <strong>MSSQL</strong>.<br>'+
+                '2. Web Server must send logs to the Backup Server at <code>'+bk+'</code> using <strong>SMB</strong>.<br>'+
+                '3. The public internet (any source) must reach the Web Server over <strong>HTTPS</strong>.'
+        };
+        D.hintText.innerHTML =
+          '<strong>MSSQL</strong> &mdash; Protocol: <code>TCP</code> &nbsp;|&nbsp; Port: <code>1433</code><br>'+
+          '<strong>SMB</strong> &nbsp;&nbsp;&nbsp;&mdash; Protocol: <code>TCP</code> &nbsp;|&nbsp; Port: <code>445</code><br>'+
+          '<strong>HTTPS</strong> &mdash; Protocol: <code>TCP</code> &nbsp;|&nbsp; Port: <code>443</code><br><br>'+
+          '<em>Pay close attention to <strong>source vs. destination</strong> direction. Rules 1 and 2 originate <em>from</em> the DMZ server, not toward it.</em>';
+      }
+
+      renderScenarioUI();
+      renderRules();
+      clearFeedback();
+    }
+
+    // ── RENDER SCENARIO SPECS (no port/protocol shown) ──
+    function renderScenarioUI(){
+      D.story.innerHTML = state.scenario.story;
+      D.specs.innerHTML = '';
+      function spec(lbl,val){
+        D.specs.innerHTML += '<div class="spec-row"><span class="spec-l">'+lbl+'</span><span class="spec-v">'+val+'</span></div>';
+      }
+      var s = state.scenario;
+      if(s.type==='level1'){
+        spec('Source (Consultant)', s.src);
+        spec('Destination (Server)', s.dst);
+        spec('Required Service', s.service.n);   // name only — no port or proto
+      } else if(s.type==='level2'){
+        spec('Threat Subnet', s.src);
+        spec('Protected Asset', s.dst);
+      } else if(s.type==='level3'){
+        spec('Web Server', s.server);
+        spec('Sysadmin IP', s.admin);
+        spec('Services Required', 'HTTPS, SSH');  // names only
+      } else if(s.type==='level4'){
+        spec('Application Server', s.server);
+        spec('Service A', s.s1.n);   // name only
+        spec('Service B', s.s2.n);   // name only
+      } else if(s.type==='level5'){
+        spec('DMZ Web Server', s.dmz);
+        spec('Internal DB', s.db);
+        spec('Backup Server', s.bk);
+        spec('Services', 'MSSQL, SMB, HTTPS'); // names only
+      }
+    }
+
+    // ── RULES CRUD ──
+    function createRule(){
+      state.rules.push({id:Date.now(), action:'ALLOW', protocol:'TCP', src:'', dst:'', port:''});
+      renderRules();
+      requestAnimationFrame(function(){
+        var rows = D.body.querySelectorAll('tr');
+        if(rows.length){ var inp=rows[rows.length-1].querySelector('input'); if(inp) inp.focus(); }
+      });
+    }
+    function removeRule(id){
+      state.rules = state.rules.filter(function(r){ return r.id!==id; });
+      renderRules();
+    }
+    function updateRule(id, field, value){
+      var r = state.rules.find(function(r){ return r.id===id; });
+      if(r) r[field]=value;
+      if(field==='action') renderRules();
+    }
+    function moveRule(id, dir){
+      var idx = state.rules.findIndex(function(r){ return r.id===id; });
+      if(idx===-1||(dir===-1&&idx===0)||(dir===1&&idx===state.rules.length-1)) return;
+      var tmp=state.rules[idx]; state.rules[idx]=state.rules[idx+dir]; state.rules[idx+dir]=tmp;
+      renderRules();
+    }
+    function resetLab(){
+      state.rules=[];
+      state.errIds=[];
+      renderRules();
+      clearFeedback();
+    }
+
+    // ── RENDER RULES ──
+    function renderRules(){
+      D.body.innerHTML='';
+      state.rules.forEach(function(rule, idx){
+        var tr=document.createElement('tr');
+        if(state.errIds.indexOf(rule.id)!==-1) tr.classList.add('row-err');
+        var ac=rule.action==='ALLOW'?'allow':'deny';
+        tr.innerHTML=
+          '<td class="col-id">'+(idx+1)+'</td>'+
+          '<td><input value="'+esc(rule.src)+'" placeholder="Source IP / CIDR" aria-label="Source IP rule '+(idx+1)+'" onchange="updateRule('+rule.id+',\'src\',this.value)"></td>'+
+          '<td><input value="'+esc(rule.dst)+'" placeholder="Destination IP" aria-label="Destination IP rule '+(idx+1)+'" onchange="updateRule('+rule.id+',\'dst\',this.value)"></td>'+
+          '<td><select aria-label="Protocol rule '+(idx+1)+'" onchange="updateRule('+rule.id+',\'protocol\',this.value)">'+
+            '<option'+(rule.protocol==='TCP'?' selected':'')+'>TCP</option>'+
+            '<option'+(rule.protocol==='UDP'?' selected':'')+'>UDP</option>'+
+            '<option'+(rule.protocol==='ANY'?' selected':'')+'>ANY</option>'+
+          '</select></td>'+
+          '<td><input value="'+esc(rule.port)+'" placeholder="Port / ANY" aria-label="Port rule '+(idx+1)+'" onchange="updateRule('+rule.id+',\'port\',this.value)"></td>'+
+          '<td><select class="'+ac+'" style="font-weight:700" aria-label="Action rule '+(idx+1)+'" onchange="updateRule('+rule.id+',\'action\',this.value)">'+
+            '<option value="ALLOW"'+(rule.action==='ALLOW'?' selected':'')+'>ALLOW</option>'+
+            '<option value="DENY"'+(rule.action==='DENY'?' selected':'')+'>DENY</option>'+
+          '</select></td>'+
+          '<td><div class="row-btns">'+
+            '<button class="btn-r mv" onclick="moveRule('+rule.id+',-1)" aria-label="Move rule '+(idx+1)+' up" title="Move up">&#9650;</button>'+
+            '<button class="btn-r mv" onclick="moveRule('+rule.id+',1)" aria-label="Move rule '+(idx+1)+' down" title="Move down">&#9660;</button>'+
+            '<button class="btn-r rm" onclick="removeRule('+rule.id+')" aria-label="Remove rule '+(idx+1)+'" title="Delete">&times;</button>'+
+          '</div></td>';
+        D.body.appendChild(tr);
+      });
+    }
+
+    // ── VERIFY ──
+    function verify(){
+      state.errIds=[];
+      if(!state.scenario){
+        showFeedback(false,'No Active Scenario','<p>Please select a difficulty level to load a scenario first.</p>');
+        return;
+      }
+      if(!state.rules.length){
+        showFeedback(false,'No Rules Configured',
+          '<div class="fb-sec"><div class="fb-sub">Analysis</div>'+
+          '<div class="fb-text">No rules detected. The implicit deny-all is blocking everything. Add the required ALLOW rules based on the scenario.</div></div>');
+        return;
+      }
+
+      var s=state.scenario, targets=[];
+      if(s.type==='level1'){
+        targets.push({src:s.src, dst:s.dst, port:String(s.service.p), protocol:s.service.proto, action:'ALLOW', desc:s.service.n+' access'});
+      } else if(s.type==='level2'){
+        targets.push({src:s.src, dst:s.dst, port:'ANY', protocol:'ANY', action:'DENY', desc:'Block all traffic from threat subnet'});
+      } else if(s.type==='level3'){
+        targets.push({src:'ANY',    dst:s.server, port:'443', protocol:'TCP', action:'ALLOW', desc:'Public HTTPS (443) to web server'});
+        targets.push({src:s.admin, dst:s.server, port:'22',  protocol:'TCP', action:'ALLOW', desc:'Sysadmin SSH (22) to web server'});
+      } else if(s.type==='level4'){
+        targets.push({src:'ANY', dst:s.server, port:String(s.s1.p), protocol:s.s1.proto, action:'ALLOW', desc:s.s1.n+' ('+s.s1.p+')'});
+        targets.push({src:'ANY', dst:s.server, port:String(s.s2.p), protocol:s.s2.proto, action:'ALLOW', desc:s.s2.n+' ('+s.s2.p+')'});
+      } else if(s.type==='level5'){
+        targets.push({src:s.dmz, dst:s.db,  port:'1433', protocol:'TCP', action:'ALLOW', desc:'DMZ \u2192 DB via MSSQL (1433)'});
+        targets.push({src:s.dmz, dst:s.bk,  port:'445',  protocol:'TCP', action:'ALLOW', desc:'DMZ \u2192 Backup via SMB (445)'});
+        targets.push({src:'ANY', dst:s.dmz, port:'443',  protocol:'TCP', action:'ALLOW', desc:'Public \u2192 DMZ via HTTPS (443)'});
+      }
+
+      var matched={}, badIds=[];
+      state.rules.forEach(function(rule){
+        var isMatch=false;
+        targets.forEach(function(t,ti){
+          if(matched[ti]) return;
+          var ms=clean(rule.src)===clean(t.src);
+          var md=clean(rule.dst)===clean(t.dst);
+          var mp=t.port==='ANY'
+            ? (clean(rule.port)==='ANY'||clean(rule.port)==='')
+            : clean(rule.port)===t.port;
+          var mr=t.protocol==='ANY'
+            ? rule.protocol==='ANY'
+            : rule.protocol===t.protocol;
+          var ma=rule.action===t.action;
+          if(ms&&md&&mp&&mr&&ma){ isMatch=true; matched[ti]=true; }
+        });
+        if(!isMatch) badIds.push(rule.id);
+      });
+
+      state.errIds=badIds;
+      var missing=targets.filter(function(_,i){ return !matched[i]; });
+      var ok=(!missing.length&&!badIds.length);
+
+      var aHTML='';
+      if(ok){
+        aHTML='<p style="color:var(--ok);font-weight:600">&#10003; All requirements satisfied. Your ACL is correct and secure.</p>';
+      } else {
+        aHTML='<ul class="err-list">';
+        if(badIds.length){
+          aHTML+='<li><strong>'+badIds.length+' incorrect rule'+(badIds.length>1?'s':'')+
+                 ':</strong> Highlighted in red. Check source, destination, protocol, port, and action against the scenario.</li>';
+        }
+        missing.forEach(function(t){ aHTML+='<li><strong>Missing rule:</strong> '+t.desc+'</li>'; });
+        aHTML+='</ul>';
+      }
+
+      renderRules();
+      showFeedback(ok,
+        ok ? '&#10003; Compliance Verified' : '&#10007; Policy Violation',
+        '<div class="fb-sec"><div class="fb-sub">Analysis</div><div class="fb-text">'+aHTML+'</div></div>'
+      );
+    }
+
+    // ── FEEDBACK ──
+    function showFeedback(ok, title, html){
+      D.fb.classList.remove('hidden','ok','er');
+      D.fb.classList.add(ok?'ok':'er');
+      D.fbTitle.innerHTML=title;
+      D.fbBody.innerHTML=html;
+      D.btnReveal.classList.toggle('hidden', ok);
+      D.fb.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+    function clearFeedback(){
+      D.fb.classList.add('hidden');
+      D.btnReveal.classList.add('hidden');
+      state.errIds=[];
+    }
+
+    // ── REVEAL SOLUTION ──
+    function revealSolution(){
+      if(document.getElementById('sol-container')) return;
+      var s=state.scenario, sol='', note='';
+      if(s.type==='level1'){
+        sol='ALLOW | Src: '+s.src+' | Dst: '+s.dst+' | '+s.service.proto+' | Port: '+s.service.p;
+        note=protoExpl(s.service);
+      } else if(s.type==='level2'){
+        sol='DENY  | Src: '+s.src+' | Dst: '+s.dst+' | ANY | ANY';
+        note='Blocking at Layer 3 (IP address + subnet) drops all packets regardless of protocol or port. The ANY/ANY entries cover every possible service.';
+      } else if(s.type==='level3'){
+        sol='Rule 1: ALLOW | Src: ANY       | Dst: '+s.server+' | TCP | 443  (HTTPS)\n'+
+            'Rule 2: ALLOW | Src: '+s.admin+' | Dst: '+s.server+' | TCP | 22   (SSH)';
+        note='Both HTTPS and SSH use <strong>TCP</strong>. Rule order does not matter here since the source IPs are distinct &mdash; ANY and '+s.admin+' do not overlap with each other in a way that causes conflict.';
+      } else if(s.type==='level4'){
+        sol='Rule 1: ALLOW | Src: ANY | Dst: '+s.server+' | '+s.s1.proto+' | '+s.s1.p+'  ('+s.s1.n+')\n'+
+            'Rule 2: ALLOW | Src: ANY | Dst: '+s.server+' | '+s.s2.proto+' | '+s.s2.p+'  ('+s.s2.n+')';
+        note=s.s1.n+': '+protoExpl(s.s1)+'<br><br>'+s.s2.n+': '+protoExpl(s.s2);
+      } else if(s.type==='level5'){
+        sol='Rule 1: ALLOW | Src: '+s.dmz+'  | Dst: '+s.db+'  | TCP | 1433  (MSSQL)\n'+
+            'Rule 2: ALLOW | Src: '+s.dmz+'  | Dst: '+s.bk+'  | TCP | 445   (SMB)\n'+
+            'Rule 3: ALLOW | Src: ANY         | Dst: '+s.dmz+' | TCP | 443   (HTTPS)';
+        note='All three services use <strong>TCP</strong>. Rules 1 and 2 originate <em>from</em> the DMZ server &mdash; the DMZ IP is the <em>source</em>, not the destination. Rule 3 is inbound to the DMZ from the public internet.';
+      }
+      D.fbBody.insertAdjacentHTML('beforeend',
+        '<div id="sol-container" class="sol-block">'+
+          '<div class="sol-lbl">&#128274; Correct Solution</div>'+
+          '<pre class="sol-code">'+esc(sol)+'</pre>'+
+          '<div class="proto-note">'+note+'</div>'+
+        '</div>'
+      );
+    }
+
+    // ── EVENTS ──
+    D.btnNew.addEventListener('click', generate);
+    D.btnAdd.addEventListener('click', createRule);
+    D.btnCheck.addEventListener('click', verify);
+    D.btnReveal.addEventListener('click', revealSolution);
+    D.btnReset.addEventListener('click', resetLab);
+    D.diff.addEventListener('change', generate);
+    D.btnHint.addEventListener('click', function(){
+      var isHidden=D.hintBox.classList.toggle('hidden');
+      D.btnHint.textContent=isHidden?'Show Intel':'Hide Intel';
+      D.btnHint.setAttribute('aria-expanded', String(!isHidden));
+      D.btnHint.classList.toggle('on', !isHidden);
+    });
+
+    // Expose for inline handlers
+    window.removeRule=removeRule;
+    window.updateRule=updateRule;
+    window.moveRule=moveRule;
+
+    // ── INIT ──
+    generate();
+  </script>
+</body>
+</html>
